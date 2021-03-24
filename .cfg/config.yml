@@ -1,0 +1,6 @@
+MONGODB:
+  DB: 'yfolio'
+  HOST: 'localhost'
+  PORT: 27017
+  USERNAME: ''
+  PASSWORD: ''
