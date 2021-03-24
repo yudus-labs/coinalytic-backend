@@ -1,0 +1,23 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Dev Server - Windows",
+      "type": "shell",
+      "command": "./run_dev_server.cmd",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Current - Windows",
+      "type": "shell",
+      "command": "venv/Scripts/python ${file}",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
