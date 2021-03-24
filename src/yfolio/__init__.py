@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_mongoengine import MongoEngine
 from .config import load_db_config
-from . import db
 
 
 def create_app(cfg_path) -> Flask:
@@ -16,13 +15,5 @@ def create_app(cfg_path) -> Flask:
         'password': cfg['PASSWORD'],
     }
     mdb = MongoEngine(app)
-
-    @app.route('/about')
-    def about():
-        return 'yFolio Backend'
-
-    @app.route('/tokens')
-    def tokens():
-        return db.ls_tokens()
 
     return app
