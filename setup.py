@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 # All dependences
 deps = {
-    'yfolio': ['Flask', 'pymongo', 'ruamel.yaml', 'flask-mongoengine'],
+    'yfolio': ['Flask', 'pymongo', 'ruamel.yaml', 'flask-mongoengine', 'flask-cors'],
     'test': [
         'pytest',
     ],
