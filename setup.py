@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 # All dependences
 deps = {
-    'yfolio': ['Flask', 'pymongo', 'ruamel.yaml', 'flask-mongoengine', 'flask-cors'],
+    'coinkit': ['Flask', 'pymongo', 'flask-cors'],
     'test': [
         'pytest',
     ],
@@ -15,10 +15,10 @@ deps = {
         'black',
     ],
 }
-deps['dev'] = deps['yfolio'] + deps['dev']
-deps['test'] = deps['yfolio'] + deps['test']
+deps['dev'] = deps['coinkit'] + deps['dev']
+deps['test'] = deps['coinkit'] + deps['test']
 
-install_requires = deps['yfolio']
+install_requires = deps['coinkit']
 extra_requires = deps
 test_requires = deps['test']
 
@@ -26,21 +26,21 @@ with open('README.adoc') as readme_file:
     long_description = readme_file.read()
 
 setup(
-    name='yfolio',
+    name='coinkit',
     version='0.0.1',
-    description='yFolio backend',
+    description='CoinKit backend',
     long_description=long_description,
     long_description_content_type='text/asciidoc',
     author='duyyudus - Yudus Labs',
     author_email='duyyudus@gmail.com',
-    url='https://github.com/yudus-labs/yfolio-backend',
+    url='https://github.com/yudus-labs/coinkit-backend',
     include_package_data=True,
     tests_require=test_requires,
     install_requires=install_requires,
     extras_require=extra_requires,
     license='MIT',
     zip_safe=False,
-    keywords='yFolio backend',
+    keywords='CoinKit backend',
     python_requires='>=3.7',
     packages=find_packages(where='src', exclude=['tests', 'tests.*', '__pycache__', '*.pyc']),
     package_dir={

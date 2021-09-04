@@ -1,12 +1,6 @@
-from pathlib import Path
-import yfolio as pib
-from yfolio import router
+from coinkit import create_server
+import os.path as osp
 
-cfg_path = Path(__file__).parent.joinpath('.cfg', 'config.yml')
+cfg = osp.join(osp.dirname(__file__), 'config.py')
 
-app = pib.create_app(cfg_path)
-router.attach(app)
-
-
-if __name__ == '__main__':
-    app.run()
+server = create_server(cfg)

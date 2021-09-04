@@ -4,20 +4,26 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Run Dev Server - Windows",
+      "label": "Run Current File",
       "type": "shell",
-      "command": "./run_dev_server.cmd",
-      "problemMatcher": []
-    },
-    {
-      "label": "Run Current - Windows",
-      "type": "shell",
-      "command": "venv/Scripts/python ${file}",
-      "problemMatcher": [],
+      "windows": {
+        "command": ".\\venv\\Scripts\\python ${file}"
+      },
+      "command": "./venv/bin/python ${file}",
       "group": {
         "kind": "build",
         "isDefault": true
-      }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Server",
+      "type": "shell",
+      "windows": {
+        "command": "./run_server.cmd"
+      },
+      "command": "./run_server.sh",
+      "problemMatcher": []
     }
   ]
 }
