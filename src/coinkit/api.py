@@ -30,6 +30,25 @@ class ApiHandler(object):
         self._server = server
         self._db = db
 
+    def validate_coin_data(self, coin_data: str) -> tuple:
+        status = Status.ERROR.value
+        data = {}
+        message = (
+            f"Invalid coin data, please provide '{COIN_USER_KEY}' and '{COIN_SYMBOL_KEY}' info"
+        )
+        try:
+            coin_data = json.loads(coin_data)
+            if COIN_USER_KEY in coin_data and COIN_SYMBOL_KEY in coin_data:
+                if coin_data[COIN_USER_KEY] and coin_data[COIN_SYMBOL_KEY]:
+                    data = coin_data
+                    status = Status.SUCCESS.value
+                    message = 'Valid coin data'
+        except Exception as e:
+            self._server.logger.debug(f'Coin data invalid: {coin_data}')
+            self._server.logger.debug(f'--Error: {e}')
+            message = f'Invalid coin data, error: {e}'
+        return status, data, message
+
     def register_api(self):
         @self._server.route('/about')
         @cross_origin()
@@ -43,66 +62,26 @@ class ApiHandler(object):
         @self._server.route('/add_coin', methods=['POST'])
         @cross_origin()
         def add_coin():
-            user = request.args.get(COIN_USER_KEY, type=str)
-            symbol = request.args.get(COIN_SYMBOL_KEY, type=str)
-            cgid = request.args.get(COIN_CGID_KEY, type=str)
-            amount = request.args.get(COIN_AMOUNT_KEY, type=float)
-            price = request.args.get(COIN_PRICE_KEY, type=float)
-            wallet_type = request.args.get(COIN_WALLET_TYPE_KEY, type=str)
-
+            coin_data = request.args.get('coin_data', type=str)
             self._server.logger.debug('Add coin:')
-            self._server.logger.debug(f'--User: {user}')
-            self._server.logger.debug(f'--Symbol: {symbol}')
+            self._server.logger.debug(f'--Coin data: {coin_data}')
 
-            if user and symbol:
-                coin_data = {
-                    COIN_USER_KEY: user,
-                    COIN_SYMBOL_KEY: symbol,
-                    COIN_CGID_KEY: cgid,
-                    COIN_AMOUNT_KEY: amount,
-                    COIN_PRICE_KEY: price,
-                    COIN_WALLET_TYPE_KEY: wallet_type,
-                }
-
-                status, data, message = self._db.add_coin(coin_data)
-
-            else:
-                status = Status.ERROR.value
-                data = {}
-                message = 'Please provide username and coin symbol'
+            status, data, message = self.validate_coin_data(coin_data)
+            if data:
+                status, data, message = self._db.add_coin(data)
 
             return {'status': status, 'data': data, 'message': message}
 
         @self._server.route('/update_coin', methods=['POST'])
         @cross_origin()
         def update_coin():
-            user = request.args.get(COIN_USER_KEY, type=str)
-            symbol = request.args.get(COIN_SYMBOL_KEY, type=str)
-            cgid = request.args.get(COIN_CGID_KEY, type=str)
-            amount = request.args.get(COIN_AMOUNT_KEY, type=float)
-            price = request.args.get(COIN_PRICE_KEY, type=float)
-            wallet_type = request.args.get(COIN_WALLET_TYPE_KEY, type=str)
-
+            coin_data = request.args.get('coin_data', type=str)
             self._server.logger.debug('Update coin:')
-            self._server.logger.debug(f'--User: {user}')
-            self._server.logger.debug(f'--Symbol: {symbol}')
+            self._server.logger.debug(f'--Coin data: {coin_data}')
 
-            if user and symbol:
-                coin_data = {
-                    COIN_USER_KEY: user,
-                    COIN_SYMBOL_KEY: symbol,
-                    COIN_CGID_KEY: cgid,
-                    COIN_AMOUNT_KEY: amount,
-                    COIN_PRICE_KEY: price,
-                    COIN_WALLET_TYPE_KEY: wallet_type,
-                }
-
-                status, data, message = self._db.update_coin(coin_data)
-
-            else:
-                status = Status.ERROR.value
-                data = {}
-                message = 'Please provide username and coin symbol'
+            status, data, message = self.validate_coin_data(coin_data)
+            if data:
+                status, data, message = self._db.update_coin(data)
 
             return {'status': status, 'data': data, 'message': message}
 
