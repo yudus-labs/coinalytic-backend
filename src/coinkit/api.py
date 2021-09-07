@@ -16,6 +16,9 @@ from .db import (
     USERNAME_KEY,
 )
 
+PORTFOLIO_DATA_COINS_KEY = 'coins'
+PORTFOLIO_DATA_BASE_CURRENCIES_KEY = 'base_currencies'
+
 
 class Status(Enum):
     SUCCESS = 'success'
@@ -47,6 +50,23 @@ class ApiHandler(object):
             self._server.logger.debug(f'Coin data invalid: {coin_data}')
             self._server.logger.debug(f'--Error: {e}')
             message = f'Invalid coin data, error: {e}'
+        return status, data, message
+
+    def validate_portfolio(self, portfolio_data: str) -> dict:
+        status = Status.ERROR.value
+        data = {}
+        message = f"Invalid portfolio data, please provide '{PORTFOLIO_DATA_COINS_KEY}' and '{PORTFOLIO_DATA_BASE_CURRENCIES_KEY}' info"
+        try:
+            tmp = json.loads(portfolio_data)
+            if PORTFOLIO_DATA_COINS_KEY in tmp and PORTFOLIO_DATA_BASE_CURRENCIES_KEY in tmp:
+                data = tmp
+                status = Status.SUCCESS.value
+                message = 'Valid portfolio data'
+        except Exception as e:
+            self._server.logger.debug(f'Portfolio data invalid: {portfolio_data}')
+            self._server.logger.debug(f'--Error: {e}')
+            message = f'Invalid portfolio data, error: {e}'
+
         return status, data, message
 
     def register_api(self):
@@ -105,16 +125,46 @@ class ApiHandler(object):
 
             return {'status': status, 'data': data, 'message': message}
 
-        @self._server.route('/ls_coins', methods=['GET'])
+        @self._server.route('/load_portfolio', methods=['GET'])
         @cross_origin()
-        def ls_coins():
+        def load_portfolio():
             user = request.args.get(COIN_USER_KEY, type=str)
 
-            self._server.logger.debug('List coin:')
+            self._server.logger.debug('Load portfolio:')
             self._server.logger.debug(f'--User: {user}')
 
             if user:
-                status, data, message = self._db.ls_coins(user)
+                status, coins, message = self._db.ls_coins(user)
+                data = {PORTFOLIO_DATA_COINS_KEY: coins, PORTFOLIO_DATA_BASE_CURRENCIES_KEY: []}
+                if coins:
+                    message = 'Loaded portfolio'
+                else:
+                    message = 'Empty portfolio'
+
+            else:
+                status = Status.ERROR.value
+                data = {}
+                message = 'Please provide username'
+
+            return {'status': status, 'data': data, 'message': message}
+
+        @self._server.route('/save_portfolio', methods=['POST'])
+        @cross_origin()
+        def save_portfolio():
+            user = request.args.get(COIN_USER_KEY, type=str)
+            portfolio_data = request.args.get('portfolio_data', type=str)
+
+            self._server.logger.debug('Save portfolio:')
+            self._server.logger.debug(f'--User: {user}')
+
+            status, portfolio_data, message = self.validate_portfolio(portfolio_data)
+
+            if user:
+                if portfolio_data:
+                    for coin in portfolio_data[PORTFOLIO_DATA_COINS_KEY]:
+                        self._db.update_coin(coin)
+                    data = {}
+                    message = 'Saved portfolio'
 
             else:
                 status = Status.ERROR.value
